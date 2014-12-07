@@ -1,5 +1,13 @@
 ## dnsmadeeasy
 
+[![Build
+Status](https://travis-ci.org/soniah/dnsmadeeasy.svg?branch=master)](https://travis-ci.org/soniah/dnsmadeeasy)
+[![Coverage](http://gocover.io/_badge/github.com/soniah/dnsmadeeasy)](http://gocover.io/github.com/soniah/dnsmadeeasy)
+[![GoDoc](https://godoc.org/github.com/soniah/dnsmadeeasy?status.png)](http://godoc.org/github.com/soniah/dnsmadeeasy)
+
+_Work in Progress_ - incomplete. I pushed in order to get Travis and
+Gocover started.
+
 This package provides the `dnsmadeeasy` package which offers
 an interface to the DNSMadeEasy API.
 
