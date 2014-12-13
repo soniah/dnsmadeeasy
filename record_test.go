@@ -44,12 +44,12 @@ func (s *S) Test_endpoint(c *C) {
 func (s *S) Test_CreateRecord(c *C) {
 	testServer.Response(201, nil, recordExample)
 
-	opts := ChangeRecord{
-		Name:  "test",
-		Value: "1.1.1.1",
+	cr := map[string]interface{}{
+		"Name":  "test",
+		"Value": "1.1.1.1",
 	}
 
-	id, err := s.client.CreateRecord("870073", &opts)
+	id, err := s.client.CreateRecord("870073", cr)
 
 	_ = testServer.WaitRequest()
 

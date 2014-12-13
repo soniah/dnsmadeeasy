@@ -29,14 +29,14 @@ func main() {
 		log.Fatalf("err: %v", err)
 	}
 
-	opts := dme.ChangeRecord{
-		Name:  "test",
-		Type:  "A",
-		Value: ip,
-		TTL:   86400,
+	cr := map[string]interface{}{
+		"name":  "test",
+		"type":  "A",
+		"value": ip,
+		"ttl":   86400,
 	}
 
-	result, err2 := client.CreateRecord(domainID, &opts)
+	result, err2 := client.CreateRecord(domainID, cr)
 	if err2 != nil {
 		log.Fatalf("Result: '%s' Error: %s", result, err2)
 	}

@@ -30,12 +30,8 @@ func makeClient(t *testing.T) *Client {
 func TestClient_NewRequest(t *testing.T) {
 	c := makeClient(t)
 
-	body := Body{
-		"foo": "bar",
-		"baz": "bar",
-	}
-
-	req, err := c.NewRequest(body, "POST", "/bar", "Thu, 04 Dec 2014 11:02:57 GMT")
+	body := bytes.NewBuffer(nil)
+	req, err := c.NewRequest("POST", "/bar", body, "Thu, 04 Dec 2014 11:02:57 GMT")
 	if err != nil {
 		t.Fatalf("bad: %v", err)
 	}

@@ -29,9 +29,9 @@ func main() {
 		log.Fatalf("err: %v", err)
 	}
 
-	req, err2 := client.RetrieveRecord(domainID, recordID)
+	req, err2 := client.ReadRecord(domainID, recordID)
 	if err2 != nil {
-		log.Fatalf("RetrieveRecord result: %v error %v", req, err2)
+		log.Fatalf("ReadRecord result: %v error %v", req, err2)
 	}
 
 	log.Print("Result: ", *req)

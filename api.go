@@ -59,26 +59,16 @@ func NewClient(akey string, skey string) (*Client, error) {
 }
 
 // NewRequest creates a new request with the params
-func (c *Client) NewRequest(body Body, method string,
-	endpoint string, requestDate string) (*http.Request, error) {
+func (c *Client) NewRequest(method, path string, body *bytes.Buffer,
+	requestDate string) (*http.Request, error) {
 
-	u, err := url.Parse(c.URL + endpoint)
-
-	if len(requestDate) == 0 {
-		requestDate = time.Now().UTC().Format(http.TimeFormat)
-	}
-
+	url, err := url.Parse(c.URL + path)
 	if err != nil {
 		return nil, fmt.Errorf("Error parsing base URL: %s", err)
 	}
 
-	rBody, err := encodeBody(body)
-	if err != nil {
-		return nil, fmt.Errorf("Error encoding request body: %s", err)
-	}
-
 	// Build the request
-	req, err := http.NewRequest(method, u.String(), rBody)
+	req, err := http.NewRequest(method, url.String(), body)
 	if err != nil {
 		return nil, fmt.Errorf("Error creating request: %s", err)
 	}
@@ -86,6 +76,9 @@ func (c *Client) NewRequest(body Body, method string,
 	// Calculate the hexadecimal HMAC SHA1 of requestDate using sKey
 	key := []byte(c.SKey)
 	h := hmac.New(sha1.New, key)
+	if len(requestDate) == 0 {
+		requestDate = time.Now().UTC().Format(http.TimeFormat)
+	}
 	h.Write([]byte(requestDate))
 	hmacString := hex.EncodeToString(h.Sum(nil))
 
@@ -99,7 +92,6 @@ func (c *Client) NewRequest(body Body, method string,
 	if method != "GET" {
 		req.Header.Add("Content-Type", "application/json")
 	}
-
 	return req, nil
 }
 
@@ -150,22 +142,12 @@ func checkResp(resp *http.Response, err error) (*http.Response, error) {
 		return resp, err
 	}
 
-	switch i := resp.StatusCode; {
-	case i == 200:
+	if resp.StatusCode/100 == 2 {
 		return resp, nil
-	case i == 201:
-		return resp, nil
-	case i == 202:
-		return resp, nil
-	case i == 204:
-		return resp, nil
-	case i == 422:
-		return nil, fmt.Errorf("API Error: %s", resp.Status)
-	case i == 400:
+	} else if resp.StatusCode == 400 {
 		return nil, parseError(resp)
-	case i == 500:
-		return nil, fmt.Errorf("API Error: %s", resp.Status)
-	default:
+	} else {
 		return nil, fmt.Errorf("API Error: %s", resp.Status)
 	}
+
 }

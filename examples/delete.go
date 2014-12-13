@@ -29,9 +29,9 @@ func main() {
 		log.Fatalf("err: %v", err)
 	}
 
-	err2 := client.DestroyRecord(domainID, recordID)
+	err2 := client.DeleteRecord(domainID, recordID)
 	if err2 != nil {
-		log.Fatalf("DestroyRecord result: %v error %v", err)
+		log.Fatalf("DeleteRecord result: %v error %v", err)
 	}
 	log.Print("Destroyed.")
 }

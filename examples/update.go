@@ -29,11 +29,11 @@ func main() {
 		log.Fatalf("err: %v", err)
 	}
 
-	opts := dme.ChangeRecord{
-		Name: "test-update",
+	cr := map[string]interface{}{
+		"name": "test-update",
 	}
 
-	req, err2 := client.UpdateRecord(domainID, recordID, &opts)
+	req, err2 := client.UpdateRecord(domainID, recordID, cr)
 	if err2 != nil {
 		log.Fatalf("UpdateRecord result: %v error %v", req, err2)
 	}
