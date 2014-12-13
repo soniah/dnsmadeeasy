@@ -5,15 +5,12 @@ Status](https://travis-ci.org/soniah/dnsmadeeasy.svg?branch=master)](https://tra
 [![Coverage](http://gocover.io/_badge/github.com/soniah/dnsmadeeasy)](http://gocover.io/github.com/soniah/dnsmadeeasy)
 [![GoDoc](https://godoc.org/github.com/soniah/dnsmadeeasy?status.png)](http://godoc.org/github.com/soniah/dnsmadeeasy)
 
-_Work in Progress_ - incomplete. I pushed in order to get Travis and
-Gocover started.
-
 This package provides the `dnsmadeeasy` package which offers
 an interface to the DNSMadeEasy API.
 
-It's intentionally designed to make heavy use of built-ins and strings
-in place of custom data structures and proper types. It also only implements
-specific endpoints, and doesn't have full API coverage.
+It doesn't have full API coverage, and only implements specific
+endpoints, as it is designed for use with
+[Terraform](https://github.com/hashicorp/terraform).
 
 **For those reasons, I recommend looking elsewhere if you just need
 a standard DNSMadeEasy API client.**

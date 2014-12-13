@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -123,15 +122,6 @@ func decodeBody(resp *http.Response, out interface{}) error {
 	return nil
 }
 
-func encodeBody(obj interface{}) (io.Reader, error) {
-	buf := bytes.NewBuffer(nil)
-	enc := json.NewEncoder(buf)
-	if err := enc.Encode(obj); err != nil {
-		return nil, err
-	}
-	return buf, nil
-}
-
 // checkResp wraps http.Client.Do() and verifies that the
 // request was successful. A non-200 request returns an error
 // formatted to included any validation problems or otherwise
@@ -146,8 +136,6 @@ func checkResp(resp *http.Response, err error) (*http.Response, error) {
 		return resp, nil
 	} else if resp.StatusCode == 400 {
 		return nil, parseError(resp)
-	} else {
-		return nil, fmt.Errorf("API Error: %s", resp.Status)
 	}
-
+	return nil, fmt.Errorf("API Error: %s", resp.Status)
 }

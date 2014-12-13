@@ -17,27 +17,27 @@ type DataResponse struct {
 // Record is used to represent a retrieved Record.
 // TODO ID should be called RecordID here
 type Record struct {
-	Name         string `json:"name"`
-	Value        string `json:"value"`
-	ID           int64  `json:"id"`
-	Type         string `json:"type"`
-	Source       int64  `json:"source"`
-	SourceID     int64  `json:"sourceId"`
-	DynamicDNS   bool   `json:"dynamicDns"`
-	Password     string `json:"password"`
-	TTL          int64  `json:"ttl"`
-	Monitor      bool   `json:"monitor"`
-	Failover     bool   `json:"failover"`
-	Failed       bool   `json:"failed"`
-	GtdLocation  string `json:"gtdLocation"`
-	Description  string `json:"description"`
-	Keywords     string `json:"keywords"`
-	Title        string `json:"title"`
-	Hardlink     bool   `json:"hardLink"`
-	MXLevel      int64  `json:"mxLevel"`
-	Weight       int64  `json:"weight"`
-	Priority     int64  `json:"priority"`
-	Port         int64  `json:"port"`
+	Name        string `json:"name"`
+	Value       string `json:"value"`
+	ID          int64  `json:"id"`
+	Type        string `json:"type"`
+	Source      int64  `json:"source"`
+	SourceID    int64  `json:"sourceId"`
+	DynamicDNS  bool   `json:"dynamicDns"`
+	Password    string `json:"password"`
+	TTL         int64  `json:"ttl"`
+	Monitor     bool   `json:"monitor"`
+	Failover    bool   `json:"failover"`
+	Failed      bool   `json:"failed"`
+	GtdLocation string `json:"gtdLocation"`
+	Description string `json:"description"`
+	Keywords    string `json:"keywords"`
+	Title       string `json:"title"`
+	Hardlink    bool   `json:"hardLink"`
+	MXLevel     int64  `json:"mxLevel"`
+	Weight      int64  `json:"weight"`
+	Priority    int64  `json:"priority"`
+	Port        int64  `json:"port"`
 }
 
 // StringID returns the id as a string
@@ -136,37 +136,38 @@ func (c *Client) ReadRecord(domainID string, recordID string) (*Record, error) {
 
 // UpdateRecord updated a record from the parameters specified and
 // returns an error if it fails.
-func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]interface {}) (string, error) {
+func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]interface{}) (int64, error) {
 
 	current, err := c.ReadRecord(domainID, recordID)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	err = mergo.Map(current, cr)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	buf := bytes.NewBuffer(nil)
 	enc := json.NewEncoder(buf)
 	if err := enc.Encode(current); err != nil {
-		return "", err
+		return 0, err
 	}
 
 	path := update.endpoint(domainID, recordID)
 	req, err := c.NewRequest("PUT", path, buf, "")
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	_, err = checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return "", fmt.Errorf("Error updating record: %s", err)
+		return 0, fmt.Errorf("Error updating record: %s", err)
 	}
 
 	// The request was successful
-	return recordID, nil
+	rid, _ := strconv.ParseInt(recordID, 10, 64) // TODO _
+	return rid, nil
 }
 
 // DeleteRecord destroys a record by the ID specified and
