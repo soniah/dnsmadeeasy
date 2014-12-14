@@ -134,8 +134,8 @@ func checkResp(resp *http.Response, err error) (*http.Response, error) {
 
 	if resp.StatusCode/100 == 2 {
 		return resp, nil
-	} else if resp.StatusCode == 400 {
-		return nil, parseError(resp)
+	} else if resp.StatusCode == 404 {
+		return nil, fmt.Errorf("Not found")
 	}
 	return nil, fmt.Errorf("API Error: %s", resp.Status)
 }

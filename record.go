@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/imdario/mergo"
-	"strconv"
 )
 
 // DataResponse is the response from a GET ie all records for
@@ -15,11 +14,10 @@ type DataResponse struct {
 }
 
 // Record is used to represent a retrieved Record.
-// TODO ID should be called RecordID here
 type Record struct {
 	Name        string `json:"name"`
 	Value       string `json:"value"`
-	ID          int64  `json:"id"`
+	RecordID    int64  `json:"id"`
 	Type        string `json:"type"`
 	Source      int64  `json:"source"`
 	SourceID    int64  `json:"sourceId"`
@@ -40,11 +38,6 @@ type Record struct {
 	Port        int64  `json:"port"`
 }
 
-// StringID returns the id as a string
-func (r *Record) StringID() string {
-	return strconv.FormatInt(r.ID, 10)
-}
-
 type requestType int
 
 const (
@@ -54,12 +47,12 @@ const (
 	destroy
 )
 
-func (rt requestType) endpoint(domainID string, recordID string) (result string) {
+func (rt requestType) endpoint(domainID int64, recordID int64) (result string) {
 	switch rt {
 	case create, retrieve:
-		result = fmt.Sprintf("/dns/managed/%s/records/", domainID)
+		result = fmt.Sprintf("/dns/managed/%d/records/", domainID)
 	case update, destroy:
-		result = fmt.Sprintf("/dns/managed/%s/records/%s/", domainID, recordID)
+		result = fmt.Sprintf("/dns/managed/%d/records/%d/", domainID, recordID)
 	}
 	return result
 }
@@ -67,39 +60,39 @@ func (rt requestType) endpoint(domainID string, recordID string) (result string)
 // CRUD - Create, Read, Update, Delete
 
 // CreateRecord creates a DNS record on DNSMadeEasy
-func (c *Client) CreateRecord(domainID string, cr map[string]interface{}) (string, error) {
+func (c *Client) CreateRecord(domainID int64, cr map[string]interface{}) (int64, error) {
 
-	path := create.endpoint(domainID, "")
+	path := create.endpoint(domainID, 0)
 	buf := bytes.NewBuffer(nil)
 	enc := json.NewEncoder(buf)
 	if err := enc.Encode(cr); err != nil {
-		return "", err
+		return 0, err
 	}
 
 	req, err := c.NewRequest("POST", path, buf, "")
 	if err != nil {
-		return "", fmt.Errorf("Error from NewRequest: %s", err)
+		return 0, fmt.Errorf("Error from NewRequest: %s", err)
 	}
 
 	resp, err := checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return "", fmt.Errorf("Error creating record: %s", err)
+		return 0, fmt.Errorf("Error creating record: %s", err)
 	}
 
 	record := new(Record)
 
 	err = decodeBody(resp, &record)
 	if err != nil {
-		return "", fmt.Errorf("Error parsing record response: %s", err)
+		return 0, fmt.Errorf("Error parsing record response: %s", err)
 	}
 
 	// The request was successful
-	return record.StringID(), nil
+	return record.RecordID, nil
 }
 
 // ReadRecord gets a record by the ID specified and returns a Record and an
 // error.
-func (c *Client) ReadRecord(domainID string, recordID string) (*Record, error) {
+func (c *Client) ReadRecord(domainID int64, recordID int64) (*Record, error) {
 	body := bytes.NewBuffer(nil)
 	path := retrieve.endpoint(domainID, recordID)
 	req, err := c.NewRequest("GET", path, body, "")
@@ -119,9 +112,8 @@ func (c *Client) ReadRecord(domainID string, recordID string) (*Record, error) {
 	}
 	var result Record
 	var found bool
-	id, _ := strconv.ParseInt(recordID, 10, 64) // TODO _
 	for _, record := range dataResp.Data {
-		if record.ID == id {
+		if record.RecordID == recordID {
 			result = record // not pointer, so data copied
 			found = true
 			break
@@ -129,14 +121,14 @@ func (c *Client) ReadRecord(domainID string, recordID string) (*Record, error) {
 	}
 
 	if !found {
-		return nil, fmt.Errorf("Unable to find record %s", recordID)
+		return nil, fmt.Errorf("Unable to find record %d", recordID)
 	}
 	return &result, nil
 }
 
 // UpdateRecord updated a record from the parameters specified and
 // returns an error if it fails.
-func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]interface{}) (int64, error) {
+func (c *Client) UpdateRecord(domainID int64, recordID int64, cr map[string]interface{}) (int64, error) {
 
 	current, err := c.ReadRecord(domainID, recordID)
 	if err != nil {
@@ -166,14 +158,13 @@ func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]in
 	}
 
 	// The request was successful
-	rid, _ := strconv.ParseInt(recordID, 10, 64) // TODO _
-	return rid, nil
+	return recordID, nil
 }
 
 // DeleteRecord destroys a record by the ID specified and
 // returns an error if it fails. If no error is returned,
 // the Record was succesfully destroyed.
-func (c *Client) DeleteRecord(domainID string, recordID string) error {
+func (c *Client) DeleteRecord(domainID int64, recordID int64) error {
 	body := bytes.NewBuffer(nil)
 	path := destroy.endpoint(domainID, recordID)
 	req, err := c.NewRequest("DELETE", path, body, "")
@@ -183,7 +174,7 @@ func (c *Client) DeleteRecord(domainID string, recordID string) error {
 
 	_, err = checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return fmt.Errorf("Error destroying record: %s", err)
+		return fmt.Errorf("Unable to find record %d", recordID)
 	}
 
 	// The request was successful

@@ -5,12 +5,17 @@ import (
 	dme "github.com/soniah/dnsmadeeasy"
 	"log"
 	"os"
+	"strconv"
 )
 
 func main() {
 	akey := os.Getenv("akey")
 	skey := os.Getenv("skey")
-	domainID := os.Getenv("domainid")
+	domainID, err := strconv.ParseInt(os.Getenv("domainid"), 10, 64)
+	if err != nil {
+		log.Fatalf("err: %v", err)
+	}
+
 	ip := os.Getenv("ip")
 
 	fmt.Println("Using these values:")
@@ -19,7 +24,7 @@ func main() {
 	fmt.Println("domainid:", domainID)
 	fmt.Println("ip:", ip)
 
-	if len(akey) == 0 || len(skey) == 0 || len(domainID) == 0 || len(ip) == 0 {
+	if len(akey) == 0 || len(skey) == 0 || domainID == 0 || len(ip) == 0 {
 		log.Fatalf("Environment variable(s) not set\n")
 	}
 
@@ -38,8 +43,8 @@ func main() {
 
 	result, err2 := client.CreateRecord(domainID, cr)
 	if err2 != nil {
-		log.Fatalf("Result: '%s' Error: %s", result, err2)
+		log.Fatalf("Result: '%d' Error: %s", result, err2)
 	}
 
-	log.Printf("Result: '%s'", result)
+	log.Printf("Result: '%d'", result)
 }
