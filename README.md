@@ -5,8 +5,8 @@ Status](https://travis-ci.org/soniah/dnsmadeeasy.svg?branch=master)](https://tra
 [![Coverage](http://gocover.io/_badge/github.com/soniah/dnsmadeeasy)](http://gocover.io/github.com/soniah/dnsmadeeasy)
 [![GoDoc](https://godoc.org/github.com/soniah/dnsmadeeasy?status.png)](http://godoc.org/github.com/soniah/dnsmadeeasy)
 
-This package provides the `dnsmadeeasy` package which offers
-an interface to the DNSMadeEasy API.
+This package provides the `dnsmadeeasy` package which offers an
+interface to the [DNSMadeEasy](http://www.dnsmadeeasy.com/) API.
 
 It doesn't have full API coverage, and only implements specific
 endpoints, as it is designed for use with
@@ -21,9 +21,9 @@ The full documentation is available on [Godoc](http://godoc.org/github.com/sonia
 
 ### Related Projects
 
-* https://github.com/pearkes/dnsimple
-* https://github.com/soniah/terraform-provider-dnsmadeeasy
+* https://github.com/soniah/terraform-provider-dme
 * https://github.com/hashicorp/terraform
+* https://github.com/pearkes/dnsimple
 
 ### License
 

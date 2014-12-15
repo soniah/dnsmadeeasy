@@ -29,10 +29,10 @@ func main() {
 	}
 
 	client, err := dme.NewClient(akey, skey)
-	client.URL = "http://api.sandbox.dnsmadeeasy.com/V2.0"
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
+	client.URL = "http://api.sandbox.dnsmadeeasy.com/V2.0"
 
 	cr := map[string]interface{}{
 		"name":  "test",
