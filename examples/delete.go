@@ -9,13 +9,13 @@ import (
 )
 
 func main() {
-	akey := os.Getenv("akey")
-	skey := os.Getenv("skey")
-	domainID, err := strconv.ParseInt(os.Getenv("domainid"), 10, 64)
+	akey := os.Getenv("DME_AKEY")
+	skey := os.Getenv("DME_SKEY")
+	domainID, err := strconv.ParseInt(os.Getenv("DME_DOMAINID"), 10, 64)
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
-	recordID, err := strconv.ParseInt(os.Getenv("recordid"), 10, 64)
+	recordID, err := strconv.ParseInt(os.Getenv("DME_RECORDID"), 10, 64)
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}

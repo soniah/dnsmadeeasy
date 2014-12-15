@@ -9,14 +9,14 @@ import (
 )
 
 func main() {
-	akey := os.Getenv("akey")
-	skey := os.Getenv("skey")
-	domainID, err := strconv.ParseInt(os.Getenv("domainid"), 10, 64)
+	akey := os.Getenv("DME_AKEY")
+	skey := os.Getenv("DME_SKEY")
+	domainID, err := strconv.ParseInt(os.Getenv("DME_DOMAINID"), 10, 64)
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
 
-	ip := os.Getenv("ip")
+	ip := os.Getenv("DME_IP")
 
 	fmt.Println("Using these values:")
 	fmt.Println("akey:", akey)
