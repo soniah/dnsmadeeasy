@@ -31,7 +31,7 @@ func main() {
 	}
 
 	client, err := dme.NewClient(akey, skey)
-	client.URL = "http://api.sandbox.dnsmadeeasy.com/V2.0"
+	client.URL = dme.SandboxURL
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}

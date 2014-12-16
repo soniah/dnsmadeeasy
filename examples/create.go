@@ -32,7 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("err: %v", err)
 	}
-	client.URL = "http://api.sandbox.dnsmadeeasy.com/V2.0"
+	client.URL = dme.SandboxURL
 
 	cr := map[string]interface{}{
 		"name":  "test",

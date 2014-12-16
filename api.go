@@ -14,6 +14,9 @@ import (
 	"time"
 )
 
+// SandboxURL is the URL of the DNS Made Easy Sandbox
+const SandboxURL = "http://api.sandbox.dnsmadeeasy.com/V2.0"
+
 // Client provides a client to the dnsmadeeasy API
 type Client struct {
 	// API Key
