@@ -1,4 +1,4 @@
-## dnsmadeeasy
+# dnsmadeeasy
 
 [![Build
 Status](https://travis-ci.org/soniah/dnsmadeeasy.svg?branch=master)](https://travis-ci.org/soniah/dnsmadeeasy)
@@ -15,16 +15,18 @@ endpoints, as it is designed for use with
 **For those reasons, I recommend looking elsewhere if you just need
 a standard DNSMadeEasy API client.**
 
-### Documentation
+Sonia Hamilton, sonia@snowfrog.net, http://blog.snowfrog.net.
+
+## Documentation
 
 The full documentation is available on [Godoc](http://godoc.org/github.com/soniah/dnsmadeeasy)
 
-### Related Projects
+## Related Projects
 
 * https://github.com/soniah/terraform-provider-dme
 * https://github.com/hashicorp/terraform
 * https://github.com/pearkes/dnsimple
 
-### License
+## License
 
 See LICENSE. Copyright the DNSMadeEasy authors, see AUTHORS.md.
