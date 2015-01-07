@@ -129,7 +129,7 @@ func (c *Client) ReadRecord(domainID string, recordID string) (*Record, error) {
 	}
 
 	if !found {
-		return nil, fmt.Errorf("Unable to find record %d", recordID)
+		return nil, fmt.Errorf("Unable to find record %s", recordID)
 	}
 	return &result, nil
 }
@@ -182,7 +182,7 @@ func (c *Client) DeleteRecord(domainID string, recordID string) error {
 
 	_, err = checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return fmt.Errorf("Unable to find record %d", recordID)
+		return fmt.Errorf("Unable to find record %s", recordID)
 	}
 
 	// The request was successful

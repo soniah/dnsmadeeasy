@@ -35,10 +35,10 @@ func (s *S) TearDownTest(c *C) {
 }
 
 func (s *S) Test_endpoint(c *C) {
-	c.Assert(create.endpoint(1, 0), Equals, "/dns/managed/1/records/")
-	c.Assert(retrieve.endpoint(1, 0), Equals, "/dns/managed/1/records/")
-	c.Assert(update.endpoint(1, 2), Equals, "/dns/managed/1/records/2/")
-	c.Assert(destroy.endpoint(1, 2), Equals, "/dns/managed/1/records/2/")
+	c.Assert(create.endpoint("1", ""), Equals, "/dns/managed/1/records/")
+	c.Assert(retrieve.endpoint("1", ""), Equals, "/dns/managed/1/records/")
+	c.Assert(update.endpoint("1", "2"), Equals, "/dns/managed/1/records/2/")
+	c.Assert(destroy.endpoint("1", "2"), Equals, "/dns/managed/1/records/2/")
 }
 
 func (s *S) Test_CreateRecordGood(c *C) {
@@ -47,10 +47,10 @@ func (s *S) Test_CreateRecordGood(c *C) {
 		"Name":  "test",
 		"Value": "1.1.1.1",
 	}
-	id, err := s.client.CreateRecord(870073, cr)
+	id, err := s.client.CreateRecord("870073", cr)
 	_ = testServer.WaitRequest()
 	c.Assert(err, IsNil)
-	c.Assert(id, Equals, int64(10022989))
+	c.Assert(id, Equals, "10022989")
 }
 
 func (s *S) Test_CreateRecordBad(c *C) {
@@ -59,14 +59,14 @@ func (s *S) Test_CreateRecordBad(c *C) {
 		"Name":  "test",
 		"Value": "1.1.1.1",
 	}
-	_, err := s.client.CreateRecord(70073, cr)
+	_, err := s.client.CreateRecord("70073", cr)
 	_ = testServer.WaitRequest()
 	c.Assert(err, NotNil)
 }
 
 func (s *S) Test_ReadRecordGood(c *C) {
 	testServer.Response(200, nil, recordRead)
-	record, err := s.client.ReadRecord(870073, 10039429)
+	record, err := s.client.ReadRecord("870073", "10039429")
 	_ = testServer.WaitRequest()
 	c.Assert(err, IsNil)
 	c.Assert(record.RecordID, Equals, int64(10039429))
@@ -74,7 +74,7 @@ func (s *S) Test_ReadRecordGood(c *C) {
 
 func (s *S) Test_ReadRecordBad(c *C) {
 	testServer.Response(200, nil, recordRead)
-	record, err := s.client.ReadRecord(870073, 1003942)
+	record, err := s.client.ReadRecord("870073", "1003942")
 	_ = testServer.WaitRequest()
 	c.Assert(err, NotNil)
 	c.Assert(record, IsNil)
@@ -87,10 +87,10 @@ func (s *S) Test_UpdateRecordGood(c *C) {
 	cr := map[string]interface{}{
 		"Name": "test-update",
 	}
-	recordID, err := s.client.UpdateRecord(870073, 10039429, cr)
+	recordID, err := s.client.UpdateRecord("870073", "10039429", cr)
 	_ = testServer.WaitRequest()
 	c.Assert(err, IsNil)
-	c.Assert(recordID, Equals, int64(10039429))
+	c.Assert(recordID, Equals, "10039429")
 }
 
 func (s *S) Test_UpdateRecordBad(c *C) {
@@ -98,22 +98,22 @@ func (s *S) Test_UpdateRecordBad(c *C) {
 	cr := map[string]interface{}{
 		"Name": "test-update",
 	}
-	recordID, err := s.client.UpdateRecord(870073, 100394, cr)
+	recordID, err := s.client.UpdateRecord("870073", "100394", cr)
 	_ = testServer.WaitRequest()
 	c.Assert(err, NotNil)
-	c.Assert(recordID, Equals, int64(0))
+	c.Assert(recordID, Equals, "")
 	c.Assert(fmt.Sprintf("%s", err), Equals, "Unable to find record 100394")
 }
 
 func (s *S) Test_DeleteRecordGood(c *C) {
 	testServer.Response(200, nil, "")
-	err := s.client.DeleteRecord(870073, 10039429)
+	err := s.client.DeleteRecord("870073", "10039429")
 	c.Assert(err, IsNil)
 }
 
 func (s *S) Test_DeleteRecordBad(c *C) {
 	testServer.Response(404, nil, "")
-	err := s.client.DeleteRecord(870073, 100394)
+	err := s.client.DeleteRecord("870073", "100394")
 	c.Assert(err, NotNil)
 	c.Assert(fmt.Sprintf("%s", err), Equals, "Unable to find record 100394")
 }
