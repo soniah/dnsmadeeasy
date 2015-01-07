@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/imdario/mergo"
+	"strconv"
 )
 
 // DataResponse is the response from a GET ie all records for
@@ -38,6 +39,13 @@ type Record struct {
 	Port        int64  `json:"port"`
 }
 
+// StringRecordID returns the record id as a string.
+func (r *Record) StringRecordID() string {
+	return strconv.FormatInt(r.RecordID, 10)
+}
+
+// ttl, err := strconv.ParseInt(opts.Ttl, 0, 0)
+
 type requestType int
 
 const (
@@ -47,12 +55,12 @@ const (
 	destroy
 )
 
-func (rt requestType) endpoint(domainID int64, recordID int64) (result string) {
+func (rt requestType) endpoint(domainID string, recordID string) (result string) {
 	switch rt {
 	case create, retrieve:
-		result = fmt.Sprintf("/dns/managed/%d/records/", domainID)
+		result = fmt.Sprintf("/dns/managed/%s/records/", domainID)
 	case update, destroy:
-		result = fmt.Sprintf("/dns/managed/%d/records/%d/", domainID, recordID)
+		result = fmt.Sprintf("/dns/managed/%s/records/%s/", domainID, recordID)
 	}
 	return result
 }
@@ -60,39 +68,39 @@ func (rt requestType) endpoint(domainID int64, recordID int64) (result string) {
 // CRUD - Create, Read, Update, Delete
 
 // CreateRecord creates a DNS record on DNSMadeEasy
-func (c *Client) CreateRecord(domainID int64, cr map[string]interface{}) (int64, error) {
+func (c *Client) CreateRecord(domainID string, cr map[string]interface{}) (string, error) {
 
-	path := create.endpoint(domainID, 0)
+	path := create.endpoint(domainID, "")
 	buf := bytes.NewBuffer(nil)
 	enc := json.NewEncoder(buf)
 	if err := enc.Encode(cr); err != nil {
-		return 0, err
+		return "", err
 	}
 
 	req, err := c.NewRequest("POST", path, buf, "")
 	if err != nil {
-		return 0, fmt.Errorf("Error from NewRequest: %s", err)
+		return "", fmt.Errorf("Error from NewRequest: %s", err)
 	}
 
 	resp, err := checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return 0, fmt.Errorf("Error creating record: %s", err)
+		return "", fmt.Errorf("Error creating record: %s", err)
 	}
 
 	record := new(Record)
 
 	err = decodeBody(resp, &record)
 	if err != nil {
-		return 0, fmt.Errorf("Error parsing record response: %s", err)
+		return "", fmt.Errorf("Error parsing record response: %s", err)
 	}
 
 	// The request was successful
-	return record.RecordID, nil
+	return record.StringRecordID(), nil
 }
 
 // ReadRecord gets a record by the ID specified and returns a Record and an
 // error.
-func (c *Client) ReadRecord(domainID int64, recordID int64) (*Record, error) {
+func (c *Client) ReadRecord(domainID string, recordID string) (*Record, error) {
 	body := bytes.NewBuffer(nil)
 	path := retrieve.endpoint(domainID, recordID)
 	req, err := c.NewRequest("GET", path, body, "")
@@ -113,7 +121,7 @@ func (c *Client) ReadRecord(domainID int64, recordID int64) (*Record, error) {
 	var result Record
 	var found bool
 	for _, record := range dataResp.Data {
-		if record.RecordID == recordID {
+		if record.StringRecordID() == recordID {
 			result = record // not pointer, so data copied
 			found = true
 			break
@@ -128,33 +136,33 @@ func (c *Client) ReadRecord(domainID int64, recordID int64) (*Record, error) {
 
 // UpdateRecord updated a record from the parameters specified and
 // returns an error if it fails.
-func (c *Client) UpdateRecord(domainID int64, recordID int64, cr map[string]interface{}) (int64, error) {
+func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]interface{}) (string, error) {
 
 	current, err := c.ReadRecord(domainID, recordID)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	err = mergo.Map(current, cr)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	buf := bytes.NewBuffer(nil)
 	enc := json.NewEncoder(buf)
 	if err := enc.Encode(current); err != nil {
-		return 0, err
+		return "", err
 	}
 
 	path := update.endpoint(domainID, recordID)
 	req, err := c.NewRequest("PUT", path, buf, "")
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	_, err = checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return 0, fmt.Errorf("Error updating record: %s", err)
+		return "", fmt.Errorf("Error updating record: %s", err)
 	}
 
 	// The request was successful
@@ -164,7 +172,7 @@ func (c *Client) UpdateRecord(domainID int64, recordID int64, cr map[string]inte
 // DeleteRecord destroys a record by the ID specified and
 // returns an error if it fails. If no error is returned,
 // the Record was succesfully destroyed.
-func (c *Client) DeleteRecord(domainID int64, recordID int64) error {
+func (c *Client) DeleteRecord(domainID string, recordID string) error {
 	body := bytes.NewBuffer(nil)
 	path := destroy.endpoint(domainID, recordID)
 	req, err := c.NewRequest("DELETE", path, body, "")
