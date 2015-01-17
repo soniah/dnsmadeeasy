@@ -16,27 +16,28 @@ type DataResponse struct {
 
 // Record is used to represent a retrieved Record.
 type Record struct {
-	Name        string `json:"name"`
-	Value       string `json:"value"`
-	RecordID    int64  `json:"id"`
-	Type        string `json:"type"`
-	Source      int64  `json:"source"`
-	SourceID    int64  `json:"sourceId"`
-	DynamicDNS  bool   `json:"dynamicDns"`
-	Password    string `json:"password"`
-	TTL         int64  `json:"ttl"`
-	Monitor     bool   `json:"monitor"`
-	Failover    bool   `json:"failover"`
-	Failed      bool   `json:"failed"`
-	GtdLocation string `json:"gtdLocation"`
-	Description string `json:"description"`
-	Keywords    string `json:"keywords"`
-	Title       string `json:"title"`
-	Hardlink    bool   `json:"hardLink"`
-	MXLevel     int64  `json:"mxLevel"`
-	Weight      int64  `json:"weight"`
-	Priority    int64  `json:"priority"`
-	Port        int64  `json:"port"`
+	Name         string `json:"name"`
+	Value        string `json:"value"`
+	RecordID     int64  `json:"id"`
+	Type         string `json:"type"`
+	Source       int64  `json:"source"`
+	SourceID     int64  `json:"sourceId"`
+	DynamicDNS   bool   `json:"dynamicDns"`
+	Password     string `json:"password"`
+	TTL          int64  `json:"ttl"`
+	Monitor      bool   `json:"monitor"`
+	Failover     bool   `json:"failover"`
+	Failed       bool   `json:"failed"`
+	GtdLocation  string `json:"gtdLocation"`
+	Description  string `json:"description"`
+	Keywords     string `json:"keywords"`
+	Title        string `json:"title"`
+	HardLink     bool   `json:"hardLink"`
+	MXLevel      int64  `json:"mxLevel"`
+	Weight       int64  `json:"weight"`
+	Priority     int64  `json:"priority"`
+	Port         int64  `json:"port"`
+	RedirectType string `json:"redirectType"`
 }
 
 // StringRecordID returns the record id as a string.
