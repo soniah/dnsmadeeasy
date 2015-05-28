@@ -83,9 +83,9 @@ func (c *Client) CreateRecord(domainID string, cr map[string]interface{}) (strin
 		return "", fmt.Errorf("Error from NewRequest: %s", err)
 	}
 
-	resp, err := checkResp(c.HTTP.Do(req))
+	resp, err, reqid := checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return "", fmt.Errorf("Error creating record: %s", err)
+		return "", fmt.Errorf("Error creating record: %s\n\tRequestID %s", err, reqid)
 	}
 
 	record := new(Record)
@@ -109,9 +109,9 @@ func (c *Client) ReadRecord(domainID string, recordID string) (*Record, error) {
 		return nil, err
 	}
 
-	resp, err := checkResp(c.HTTP.Do(req))
+	resp, err, reqid := checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return nil, fmt.Errorf("Error retrieving record: %s", err)
+		return nil, fmt.Errorf("Error retrieving record: %s\n\tRequestID %s", err, reqid)
 	}
 
 	dataResp := DataResponse{}
@@ -139,6 +139,8 @@ func (c *Client) ReadRecord(domainID string, recordID string) (*Record, error) {
 // returns an error if it fails.
 func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]interface{}) (string, error) {
 
+    var reqid string
+
 	current, err := c.ReadRecord(domainID, recordID)
 	if err != nil {
 		return "", err
@@ -161,9 +163,9 @@ func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]in
 		return "", err
 	}
 
-	_, err = checkResp(c.HTTP.Do(req))
+	_, err, reqid = checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return "", fmt.Errorf("Error updating record: %s", err)
+		return "", fmt.Errorf("Error updating record: %s\n\tRequestID %s", err, reqid)
 	}
 
 	// The request was successful
@@ -174,6 +176,7 @@ func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]in
 // returns an error if it fails. If no error is returned,
 // the Record was succesfully destroyed.
 func (c *Client) DeleteRecord(domainID string, recordID string) error {
+	var reqid string
 	body := bytes.NewBuffer(nil)
 	path := destroy.endpoint(domainID, recordID)
 	req, err := c.NewRequest("DELETE", path, body, "")
@@ -181,9 +184,9 @@ func (c *Client) DeleteRecord(domainID string, recordID string) error {
 		return err
 	}
 
-	_, err = checkResp(c.HTTP.Do(req))
+	_, err, reqid = checkResp(c.HTTP.Do(req))
 	if err != nil {
-		return fmt.Errorf("Unable to find record %s", recordID)
+		return fmt.Errorf("Unable to find record %s\n\tRequestID %s", recordID, reqid)
 	}
 
 	// The request was successful

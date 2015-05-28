@@ -128,17 +128,19 @@ func decodeBody(resp *http.Response, out interface{}) error {
 // checkResp wraps http.Client.Do() and verifies that the
 // request was successful. A non-200 request returns an error
 // formatted to included any validation problems or otherwise
-func checkResp(resp *http.Response, err error) (*http.Response, error) {
+func checkResp(resp *http.Response, err error) (*http.Response, error, string) {
 	// If the err is already there, there was an error higher
 	// up the chain, so just return that
 	if err != nil {
-		return resp, err
+		return resp, err, "N/A"
 	}
 
+	reqid := resp.Header.Get("x-dnsme-requestId")
+
 	if resp.StatusCode/100 == 2 {
-		return resp, nil
+		return resp, nil, reqid
 	} else if resp.StatusCode == 404 {
-		return nil, fmt.Errorf("Not found")
+		return nil, fmt.Errorf("Not found"), reqid
 	}
-	return nil, fmt.Errorf("API Error: %s", resp.Status)
+	return nil, fmt.Errorf("API Error: %s", resp.Status), reqid
 }
