@@ -2,8 +2,8 @@ package dnsmadeeasy
 
 import (
 	"fmt"
-	. "github.com/motain/gocheck"
 	"github.com/soniah/dnsmadeeasy/testutil"
+	. "gopkg.in/check.v1"
 	"testing"
 )
 
