@@ -129,7 +129,7 @@ func (s *S) Test_UpdateRecordMergesChanges(c *C) {
 
 	cr := map[string]interface{}{
 		"name": "test-update",
-		"TTL":  int64(1234),
+		"ttl":  int64(1234),
 	}
 
 	recordID, err := client.UpdateRecord("870073", "10039429", cr)
