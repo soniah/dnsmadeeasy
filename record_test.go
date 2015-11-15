@@ -119,7 +119,7 @@ func (s *S) Test_UpdateRecordMergesChanges(c *C) {
 			decoder.Decode(&actual)
 			c.Assert(actual.Name, Equals, "test-update")
 			c.Assert(actual.Value, Equals, "1.1.1.2")
-			c.Assert(actual.TTL, Equals, int64(1234))
+			c.Assert(actual.Ttl, Equals, int64(1234))
 		}
 	}))
 	defer ts.Close()

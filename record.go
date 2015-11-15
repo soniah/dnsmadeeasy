@@ -24,7 +24,7 @@ type Record struct {
 	SourceID     int64  `json:"sourceId"`
 	DynamicDNS   bool   `json:"dynamicDns"`
 	Password     string `json:"password"`
-	TTL          int64  `json:"ttl"`
+	Ttl          int64  `json:"ttl"`
 	Monitor      bool   `json:"monitor"`
 	Failover     bool   `json:"failover"`
 	Failed       bool   `json:"failed"`
