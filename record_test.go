@@ -1,9 +1,12 @@
 package dnsmadeeasy
 
 import (
+	"encoding/json"
 	"fmt"
 	. "github.com/motain/gocheck"
 	"github.com/soniah/dnsmadeeasy/testutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -103,6 +106,35 @@ func (s *S) Test_UpdateRecordBad(c *C) {
 	c.Assert(err, NotNil)
 	c.Assert(recordID, Equals, "")
 	c.Assert(fmt.Sprintf("%s", err), Equals, "Unable to find record 100394")
+}
+
+func (s *S) Test_UpdateRecordMergesChanges(c *C) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			fmt.Fprintln(w, recordRead)
+		case "PUT":
+			var actual Record
+			decoder := json.NewDecoder(r.Body)
+			decoder.Decode(&actual)
+			c.Assert(actual.Name, Equals, "test-update")
+			c.Assert(actual.Value, Equals, "1.1.1.2")
+			c.Assert(actual.TTL, Equals, int64(1234))
+		}
+	}))
+	defer ts.Close()
+
+	client, _ := NewClient("aaaaaa1a-11a1-1aa1-a101-11a1a11aa1aa", "11a0a11a-a1a1-111a-a11a-a11110a11111")
+	client.URL = ts.URL
+
+	cr := map[string]interface{}{
+		"name": "test-update",
+		"TTL":  int64(1234),
+	}
+
+	recordID, err := client.UpdateRecord("870073", "10039429", cr)
+	c.Assert(err, IsNil)
+	c.Assert(recordID, Equals, "10039429")
 }
 
 func (s *S) Test_DeleteRecordGood(c *C) {

@@ -144,7 +144,7 @@ func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]in
 		return "", err
 	}
 
-	err = mergo.Map(current, cr)
+	err = mergo.MapWithOverwrite(current, cr)
 	if err != nil {
 		return "", err
 	}
