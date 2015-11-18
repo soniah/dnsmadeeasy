@@ -1,9 +1,12 @@
 package dnsmadeeasy
 
 import (
+	"encoding/json"
 	"fmt"
 	. "github.com/motain/gocheck"
 	"github.com/soniah/dnsmadeeasy/testutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -105,6 +108,66 @@ func (s *S) Test_UpdateRecordBad(c *C) {
 	c.Assert(fmt.Sprintf("%s", err), Equals, "Unable to find record 100394")
 }
 
+func (s *S) Test_UpdateRecordMergesChanges(c *C) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			fmt.Fprintln(w, recordRead)
+		case "PUT":
+			var actual Record
+
+			expected := Record{
+				Name:         "test-update",
+				RecordID:     10039430,
+				Source:       1,
+				SourceID:     870073,
+				Type:         "CNAME",
+				Value:        "10.10.10.20",
+				TTL:          int64(1234),
+				MXLevel:      int64(6),
+				Weight:       int64(11),
+				Priority:     int64(16),
+				Port:         int64(8081),
+				Keywords:     "keywords-update",
+				Title:        "title-update",
+				HardLink:     true,
+				RedirectType: "Standard - 301",
+				Description:  "description-update",
+				GtdLocation:  "DEFAULT",
+			}
+
+			decoder := json.NewDecoder(r.Body)
+			decoder.Decode(&actual)
+
+			c.Assert(actual, DeepEquals, expected)
+		}
+	}))
+	defer ts.Close()
+
+	client, _ := NewClient("aaaaaa1a-11a1-1aa1-a101-11a1a11aa1aa", "11a0a11a-a1a1-111a-a11a-a11110a11111")
+	client.URL = ts.URL
+
+	cr := map[string]interface{}{
+		"name":         "test-update",
+		"type":         "CNAME",
+		"value":        "10.10.10.20",
+		"ttl":          int64(1234),
+		"mxLevel":      int64(6),
+		"weight":       int64(11),
+		"priority":     int64(16),
+		"port":         int64(8081),
+		"keywords":     "keywords-update",
+		"title":        "title-update",
+		"hardLink":     true,
+		"redirectType": "Standard - 301",
+		"description":  "description-update",
+	}
+
+	recordID, err := client.UpdateRecord("870073", "10039430", cr)
+	c.Assert(err, IsNil)
+	c.Assert(recordID, Equals, "10039430")
+}
+
 func (s *S) Test_DeleteRecordGood(c *C) {
 	testServer.Response(200, nil, "")
 	err := s.client.DeleteRecord("870073", "10039429")
@@ -148,7 +211,7 @@ var recordRead = `{
       "dynamicDns":false,
       "failed":false,
       "gtdLocation":"DEFAULT",
-      "ha    rdLink":false,
+      "hardLink":false,
       "ttl":86400
     },
     {
@@ -163,8 +226,31 @@ var recordRead = `{
       "dynamicDns":false,
       "failed":false,
       "gtdLocation":"DEFAULT",
-      "ha    rdLink":false,
+      "hardLink":false,
       "ttl":86400
+    },
+    {
+      "name":"test-merge",
+      "value":"1.1.1.3",
+      "id":10039430,
+      "type":"A",
+      "source":1,
+      "failover":false,
+      "monitor":false,
+      "sourceId":870073,
+      "dynamicDns":false,
+      "failed":false,
+      "gtdLocation":"DEFAULT",
+      "hardLink":false,
+      "ttl":86400,
+      "mxLevel": 5,
+      "weight": 10,
+      "priority": 15,
+      "port": 8080,
+      "keywords": "keywords",
+      "title": "title",
+      "redirectType": "Hidden Frame Masked",
+      "description": "description"
     }
   ],
   "page":0,

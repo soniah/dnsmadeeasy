@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/imdario/mergo"
+	"github.com/mitchellh/mapstructure"
 	"strconv"
 )
 
@@ -16,28 +16,28 @@ type DataResponse struct {
 
 // Record is used to represent a retrieved Record.
 type Record struct {
-	Name         string `json:"name"`
-	Value        string `json:"value"`
+	Name         string `json:"name" mapstructure:"name"`
+	Value        string `json:"value" mapstructure:"value"`
 	RecordID     int64  `json:"id"`
-	Type         string `json:"type"`
+	Type         string `json:"type" mapstructure:"type"`
 	Source       int64  `json:"source"`
 	SourceID     int64  `json:"sourceId"`
 	DynamicDNS   bool   `json:"dynamicDns"`
 	Password     string `json:"password"`
-	TTL          int64  `json:"ttl"`
+	TTL          int64  `json:"ttl" mapstructure:"ttl"`
 	Monitor      bool   `json:"monitor"`
 	Failover     bool   `json:"failover"`
 	Failed       bool   `json:"failed"`
 	GtdLocation  string `json:"gtdLocation"`
-	Description  string `json:"description"`
-	Keywords     string `json:"keywords"`
-	Title        string `json:"title"`
-	HardLink     bool   `json:"hardLink"`
-	MXLevel      int64  `json:"mxLevel"`
-	Weight       int64  `json:"weight"`
-	Priority     int64  `json:"priority"`
-	Port         int64  `json:"port"`
-	RedirectType string `json:"redirectType"`
+	Description  string `json:"description" mapstructure:"description"`
+	Keywords     string `json:"keywords" mapstructure:"keywords"`
+	Title        string `json:"title" mapstructure:"title"`
+	HardLink     bool   `json:"hardLink" mapstructure:"hardLink"`
+	MXLevel      int64  `json:"mxLevel" mapstructure:"mxLevel"`
+	Weight       int64  `json:"weight" mapstructure:"weight"`
+	Priority     int64  `json:"priority" mapstructure:"priority"`
+	Port         int64  `json:"port" mapstructure:"port"`
+	RedirectType string `json:"redirectType" mapstructure:"redirectType"`
 }
 
 // StringRecordID returns the record id as a string.
@@ -144,7 +144,7 @@ func (c *Client) UpdateRecord(domainID string, recordID string, cr map[string]in
 		return "", err
 	}
 
-	err = mergo.Map(current, cr)
+	err = mapstructure.Decode(cr, current)
 	if err != nil {
 		return "", err
 	}
